@@ -46,7 +46,7 @@ const Header = ({ handleShowDropdown, isShowDropdown }: HeaderProps) => {
                   setIsShow(!isShow);
                 }}
               />
-              <span className="d-none d-lg-inline-flex">John Doe</span>
+              <span className="d-none d-lg-inline-flex">Hoang Trung Nhat</span>
             </div>
             {isShow && (
               <div className="bg-white border border-solid border-[#e6ebeb] rounded-bottom m-0 absolute top-[46px] rounded">

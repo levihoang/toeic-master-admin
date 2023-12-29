@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Holtwood+One+SC&family=Inter:wght@500;600;700;800&family=Lato:ital,wght@0,100;0,300;0,400;0,700;1,100;1,300;1,400;1,700&family=Lobster&family=Lobster+Two:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:wght@400;500;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import '../style/form.scss';
+@import '../style/button.scss';
+@import './bootstrap.min.css';
+@import '../style/main.scss';
+@import '../style/bootstrap.scss';
+@import '../style/table.scss';
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+@media only screen and (min-width: 1180px) {
+  .container {
+    width: 1180px;
+    padding-right: 0px;
+    padding-left: 0px;
+    @apply mx-auto;
+  }
+}
+
+.container {
+  width: 100%;
+  padding-right: 30px;
+  padding-left: 30px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.border-dash {
+  border: 1px dashed #0795fe;
+}

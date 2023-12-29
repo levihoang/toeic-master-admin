@@ -1,0 +1,51 @@
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+  pointer-events: none;
+  @apply flex fixed items-center justify-center font-primary left-0 top-0 right-0 bottom-0 md:p-4;
+}
+.modal.enter-done {
+  opacity: 1;
+  pointer-events: visible;
+}
+.modal.exit {
+  opacity: 0;
+}
+.modal-content {
+  background-size: contain;
+  background-position: center right;
+  background-repeat: no-repeat;
+  transition: all 0.3s ease-in-out;
+  @apply min-h-screen md:min-h-0 md:rounded bg-white w-full p-6 pr-2 shadow-md shadow-gray-82;
+}
+.modal-content-container {
+  max-height: calc(100vh - 30px);
+  height: 100%;
+  @apply pr-4;
+}
+.modal-body {
+  height: 100%;
+}
+.modal.enter-done .modal-content {
+  transform: translateY(0);
+}
+.modal.exit .modal-content {
+  transform: translateY(-200px);
+}
+.modal-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.modal-header,
+.modal-footer {
+  padding: 10px;
+}
+.modal-title {
+  margin: 0;
+}
+
+.modal-title-input {
+  font-size: 18px;
+  font-weight: 600;
+}

@@ -1,0 +1,26 @@
+.breadcrumb {
+  padding: 0;
+  background: transparent;
+  margin: 0 0 1.5rem;
+  position: relative;
+  text-shadow: #fff 0 1px;
+  @apply flex text-xs;
+
+  &-item {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+  }
+  &-disabled {
+    color: #868e96;
+    @apply cursor-default;
+  }
+}
+.breadcrumb-item + .breadcrumb-item::before {
+  display: inline-block;
+  padding-right: 0.5rem;
+  color: inherit;
+  content: "/";
+  padding-left: 8px;
+}

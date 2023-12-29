@@ -1,0 +1,85 @@
+.table {
+  thead tr {
+    @apply text-sm text-left font-normal leading-5 bg-white;
+    // background-color: #ffed8a;
+
+    span {
+      @apply whitespace-nowrap;
+    }
+  }
+
+  tbody tr td {
+    min-height: 125px !important;
+  }
+
+  tbody tr {
+    height: 125px;
+  }
+
+  &-action {
+    color: inherit;
+    font-size: 14px;
+  }
+
+  &-action-delete {
+    color: #e4033b;
+  }
+
+  &-action-edit {
+    color: #009ef7;
+  }
+
+  &-action-refund {
+    color: #00b67c;
+  }
+
+  &-action-btn {
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+  }
+
+  &-action-btn:hover {
+    background-color: #f5f8fa;
+  }
+
+  thead tr th {
+    padding: 12px 10px;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #dddddd;
+  }
+
+  tbody td,
+  tbody th {
+    @apply text-sm text-left font-normal leading-5;
+  }
+
+  tbody tr:nth-child(odd) {
+    td,
+    th {
+      background: white;
+      padding: 12px 10px;
+    }
+  }
+
+  tbody tr:nth-child(even) {
+    td,
+    th {
+      background: #ffffff;
+      padding: 12px 10px;
+    }
+  }
+
+  tbody tr:hover {
+    td,
+    th {
+      background-color: #c7e0f5;
+    }
+  }
+}
+
+.table > tbody > tr:last-child {
+  border-bottom: 2px solid #c7e0f5;
+}

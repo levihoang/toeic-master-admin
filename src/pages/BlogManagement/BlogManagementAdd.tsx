@@ -9,8 +9,6 @@ import Modal from '../../components/Modal';
 import { CircleSpin } from '../../assets/icons/CircleSpin';
 import { Button } from '../../components/button/Button';
 import { ArticleCard } from '../../components/ArticleCard';
-import BlogEditorByJodit from '../../components/Editor/BlogEditorByJodit';
-import EditorByJodit from '../../components/Editor/EditorByJodit';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../services/firestore.service';
 import { v4 } from 'uuid';

@@ -383,7 +383,33 @@ const GroupQuestion = () => {
     }
   };
 
-  console.log('listTypeId', listTypeId);
+  const clearModal = () => {
+    setGroupQuestionId(undefined);
+    setGroupQuestionDetail(undefined);
+    setImageLink(undefined);
+    setAudioLink(undefined);
+    setQuestions([question]);
+    setListTypeId([]);
+    setValue('title', '');
+    setValue('content', '');
+    setValue('transcript', '');
+    questions.map((item: any, index: number) => {
+      setValue(`content_question_${index}`, '');
+      setValue(`answer_${index}`, '');
+      setValue(`explain_${index}`, '');
+      setValue(`option_A_${index}`, '');
+      setValue(`option_B_${index}`, '');
+      setValue(`option_C_${index}`, '');
+      setValue(`option_D_${index}`, '');
+      setValue(`type_${index}`, '');
+    });
+  };
+
+  useEffect(() => {
+    if (!confirmAddModal) {
+      clearModal();
+    }
+  }, [confirmAddModal]);
 
   return (
     <>
@@ -461,7 +487,7 @@ const GroupQuestion = () => {
           </table>
         </div>
         {groupQuestion?.contents?.length === 0 && !loading && (
-          <p className="text-center text-sm mt-3">No account found</p>
+          <p className="text-center text-sm mt-3">No group question found</p>
         )}
         {groupQuestion &&
           groupQuestion?.totalItem > itemPerPage &&
@@ -916,12 +942,13 @@ const GroupQuestion = () => {
                               return typeQuestion?.find(
                                 (item2: any) => item2.value === item.value
                               );
-                            }) ||
-                            getValues(`type_${index}`)?.map((item: any) => {
-                              return typeQuestion?.find(
-                                (item2: any) => item2.value === item.value
-                              );
-                            })
+                            }) || getValues(`type_${index}`)
+                              ? getValues(`type_${index}`)?.map((item: any) => {
+                                  return typeQuestion?.find(
+                                    (item2: any) => item2.value === item.value
+                                  );
+                                })
+                              : []
                           }
                           onChange={(e: any) => {
                             setListTypeId(e);

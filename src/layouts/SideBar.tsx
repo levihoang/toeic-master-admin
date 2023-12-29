@@ -61,6 +61,26 @@ const SideBar = () => {
               Account Management
             </Link>
           </div>
+          <div className="navbar-nav w-100">
+            <Link
+              to={'/course'}
+              className={`nav-item nav-link ${
+                pathName.startsWith('/course') ? 'active' : ''
+              }`}
+            >
+              Course Management
+            </Link>
+          </div>
+          <div className="navbar-nav w-100">
+            <Link
+              to={'/exam'}
+              className={`nav-item nav-link ${
+                pathName.startsWith('/exam') ? 'active' : ''
+              }`}
+            >
+              Exam Management
+            </Link>
+          </div>
         </div>
       </nav>
     </div>

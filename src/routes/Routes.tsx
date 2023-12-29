@@ -4,6 +4,8 @@ import { HomeRoutes } from './HomeRoutes';
 import LoginRoutes from './LoginRoutes';
 import { BlogRoutes } from './BlogRoutes';
 import AccountRoutes from './AccountRoutes';
+import { CourseRoutes } from './CourseRoutes';
+import { ExamRoutes } from './ExamRoutes';
 
 const routes = () => {
   return (
@@ -14,6 +16,8 @@ const routes = () => {
         <Route path="/blog/*" element={<BlogRoutes />} />
         <Route path="/account/*" element={<AccountRoutes />} />
         <Route path="/group-question/*" element={<HomeRoutes />} />
+        <Route path="/course/*" element={<CourseRoutes />} />
+        <Route path="/exam/*" element={<ExamRoutes />} />
       </Routes>
     </>
   );

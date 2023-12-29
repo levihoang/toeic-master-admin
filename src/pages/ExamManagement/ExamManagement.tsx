@@ -1,24 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import ExamService from '../../services/exam.service';
+import { CircleSpin } from '../../assets/icons/CircleSpin';
+import { AiOutlineEdit } from 'react-icons/ai';
 import Breadcrumb from '../../components/breadcrumb/Breadcrumb';
 import TitlePage from '../../components/titlePage/TitlePage';
 import { BookIcon } from '../../assets/icons/BookIcon';
-import { Link, useNavigate } from 'react-router-dom';
-import ItemsPerPage from '../../components/ItemsPerPage';
-import CategoryService from '../../services/category.service';
 import { Button } from '../../components/button/Button';
-import { CircleSpin } from '../../assets/icons/Index';
-import { AiOutlineEdit } from 'react-icons/ai';
+import moment from 'moment';
+import { FORM_FORMAT } from '../../constant/form.const';
 
-export const HomePage = () => {
+const ExamManagement = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [itemPerPage, setItemPerPage] = useState<number>(20);
   const [currentPage, setCurrentPage] = useState(1);
-  const [category, setCategory] = useState<any>([]);
-
-  const [crumbs] = useState([
-    { name: 'Category Management', url: '/category' }
-  ]);
+  const [examData, setExamData] = useState<any>();
+  const [crumbs] = useState([{ name: 'Exam Management', url: '/exam' }]);
+  const [searchParams] = useSearchParams();
 
   const selected = (url: any) => {
     if (url) {
@@ -28,31 +27,29 @@ export const HomePage = () => {
     }
   };
 
-  const getCategory = async () => {
+  const getData = async (params?: any) => {
     setLoading(true);
-    try {
-      const res = await CategoryService.get_category();
-      if (res.statusCode === 200) {
-        setCategory(res.data);
-      }
-    } catch (error) {
-      console.log(error);
+    const res = await ExamService.get_list();
+    if (res.statusCode === 200) {
+      setExamData(res?.data);
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    getCategory();
+    getData();
   }, []);
+
+  console.log('examData', examData);
 
   return (
     <>
       <Breadcrumb crumbs={crumbs} selected={selected} />
       <div className="flex items-center justify-between">
-        <TitlePage icon={() => <BookIcon />} name="Category Management" />
+        <TitlePage icon={() => <BookIcon />} name="Exam Management" />
         <div className="flex">
           <div className="mr-6">
-            <Button url="category-add">Create Category</Button>
+            <Button url="blog-add">Create Exam</Button>
           </div>
         </div>
       </div>
@@ -63,36 +60,41 @@ export const HomePage = () => {
               <tr>
                 <th>STT</th>
                 <th scope="col">
-                  <span>Code</span>
+                  <span>Title</span>
                 </th>
                 <th>
-                  <span>Parent Code</span>
+                  <span>Order</span>
                 </th>
                 <th scope="col">
-                  <span>Name</span>
-                </th>
-                <th scope="col" className="w-[60%]">
-                  <span>Description</span>
+                  <span>Date Create</span>
                 </th>
                 <th scope="col">
+                  <span>Status</span>
                 </th>
+                <th scope="col"></th>
               </tr>
             </thead>
             {!loading && (
               <tbody>
-                {category.map((item: any, index: number) => {
+                {examData?.map((item: any, index: number) => {
                   return (
                     <tr key={item?._id}>
                       <th>{(currentPage - 1) * itemPerPage + index + 1}</th>
-                      <th className="font-semibold" scope="row">
-                        {item?.code || '-'}
-                      </th>
-                      <td className="order">{item?.parentCode || '-'}</td>
-                      <td>{item?.name || '-'}</td>
-                      <td className="order">{item?.description || '-'}</td>
+                      <td className="order">{item?.title || '-'}</td>
+                      <td className="order">{item?.zOrder || '-'}</td>
+                      <td className="order">
+                        {moment(new Date(item.createdAt)).format(
+                          FORM_FORMAT.TABLE_DATE
+                        ) || '-'}
+                      </td>
+                      <td className={`order`}>
+                        <p>
+                          {item?.status || '-'}
+                        </p>
+                      </td>
                       <td>
                         <div className="table-action-btn table-action-edit w-fit">
-                          <Link to={`category-edit/${item._id}`}>
+                          <Link to={`exam-edit/${item._id}`}>
                             <AiOutlineEdit />
                           </Link>
                         </div>
@@ -104,9 +106,10 @@ export const HomePage = () => {
             )}
           </table>
         </div>
-        {category?.length === 0 && !loading && (
-          <p className="text-center text-sm mt-3">No category found</p>
+        {examData?.length === 0 && !loading && (
+          <p className="text-center text-sm mt-3">No exam found</p>
         )}
+
         {loading && (
           <>
             <div className="flex justify-center mt-4 items-center tex-sm">
@@ -118,3 +121,5 @@ export const HomePage = () => {
     </>
   );
 };
+
+export default ExamManagement;

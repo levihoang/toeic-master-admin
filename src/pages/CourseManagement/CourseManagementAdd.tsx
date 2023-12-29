@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Breadcrumb from '../../components/breadcrumb/Breadcrumb';
 import TitlePage from '../../components/titlePage/TitlePage';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { SubmitHandler, useForm } from 'react-hook-form';
 import { BookIcon } from '../../assets/icons/BookIcon';
 import { toast } from 'react-toastify';
 import { ArticleCard } from '../../components/ArticleCard';
 import { CircleSpin } from '../../assets/icons/CircleSpin';
-import Select from 'react-select';
+import CourseChapter from './CourseChapter';
 import { Button } from '../../components/button/Button';
 import Modal from '../../components/Modal';
-import CategoryService from '../../services/category.service';
-import GroupQuestion from './GroupQuestion';
+import { v4 } from 'uuid';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { storage } from '../../services/firestore.service';
+import CourseService from '../../services/course.service';
 
 enum Tab {
-  CATEGORY,
-  GROUP_QUESTION
+  COURSE,
+  COURSE_CHAPTER
 }
 
 const OptionStyle = {
@@ -26,32 +28,28 @@ const OptionStyle = {
 const tabActiveStyle =
   'border-r border-t-2 border-l border-t-009CFF bg-white border-solid border-CED4DA font-bold';
 
-const CategoryAdd = () => {
+const CourseManagementAdd = () => {
   const _paramsURL = useParams();
   const [paramsURL, setParamsURL] = useState({ ..._paramsURL });
-  const [detailCategory, setDetailCategory] = useState<any>({});
   const [confirmAddModal, setConfirmAddModal] = useState(false);
   const [submitAdd, setSubmitAdd] = useState(false);
   const [confirmUpdateModal, setConfirmUpdateModal] = useState(false);
   const [submitUpdate, setSubmitUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [parentCode, setParentCode] = useState({
-    value: '',
-    label: ''
-  });
-  const [tabActive, setTabActive] = useState<Tab>(Tab.CATEGORY);
-
   const navigate = useNavigate();
+  const [tabActive, setTabActive] = useState<Tab>(Tab.COURSE);
+  const [imageError, setImgError] = useState<any>();
+  const [imageURL, setImageUrl] = useState<any>();
+  const [currentFile, setCurrentFile] = useState<any>();
+
   const [crumbs] = useState([
     {
-      name: 'Category Management',
-      url: `/`
+      name: 'Course Management',
+      url: `/course`
     },
     {
-      name: `${paramsURL.id ? 'Edit Category' : 'Create Category'}`,
-      url: `${
-        paramsURL.id ? `/category-edit/${paramsURL.id}` : '/category-add'
-      }`
+      name: `${paramsURL.id ? 'Edit Course' : 'Create Course'}`,
+      url: `${paramsURL.id ? `/course-edit/${paramsURL.id}` : '/course-add'}`
     }
   ]);
 
@@ -72,21 +70,15 @@ const CategoryAdd = () => {
     }
   };
 
-  const getData = async (id: string) => {
+  const getDetailCourse = async (id: any) => {
     setLoading(true);
-    const res = await CategoryService.detail_category(id);
+    const res = await CourseService.get_detail(id);
     if (res?.statusCode === 200) {
-      setDetailCategory(res?.data);
-      setParentCode({
-        value: res?.data?.parentCode,
-        label: res?.data?.parentCode
-      });
-      setValue('code', res?.data?.code);
-      setValue('description', res?.data?.description);
       setValue('name', res?.data?.name);
-      setValue('parentCode', res?.data?.parentCode);
+      setValue('description', res?.data?.description);
+      setImageUrl(res?.data?.imgUrl);
     } else {
-      toast.error("Can't get detail category! Please try again.", {
+      toast.error('Get Detail Fail! Please try again.', {
         position: 'top-right',
         autoClose: 5000,
         hideProgressBar: false,
@@ -100,22 +92,32 @@ const CategoryAdd = () => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    if (paramsURL.id) {
-      getData(paramsURL.id);
-    }
-  }, [paramsURL.id]);
-
   const submitHandler: SubmitHandler<any> = async value => {
     if (paramsURL.id) {
-      const params = {
+      let params = {
         ...value,
-        id: paramsURL.id,
-        parentCode: parentCode?.value
+        id: paramsURL.id
       };
       setSubmitUpdate(true);
+
       try {
-        const res = await CategoryService.update_category(params);
+        if (currentFile) {
+          const idImage = v4();
+          const imageRef = ref(storage, `images/${idImage}`);
+          const e = await uploadBytes(imageRef, currentFile.target.files[0]);
+          const url = await getDownloadURL(e?.ref);
+
+          if (!url) {
+            toast.error('Image is required!' /* ... */);
+            setSubmitAdd(false);
+            return;
+          }
+
+          params = { ...params, imgUrl: url };
+        } else {
+          params = { ...params, imgUrl: imageURL };
+        }
+        const res = await CourseService.update_course(params);
         if (res?.statusCode === 200) {
           setSubmitUpdate(false);
           setConfirmUpdateModal(false);
@@ -160,14 +162,27 @@ const CategoryAdd = () => {
     }
 
     if (!paramsURL.id) {
-      const params = {
-        ...value,
-        parentCode: parentCode?.value
+      let params = {
+        ...value
       };
-
       setSubmitAdd(true);
       try {
-        const res = await CategoryService.create_category(params);
+        if (currentFile) {
+          const idImage = v4();
+          const imageRef = ref(storage, `images/${idImage}`);
+          const e = await uploadBytes(imageRef, currentFile.target.files[0]);
+          const url = await getDownloadURL(e?.ref);
+
+          if (!url) {
+            toast.error('Image is required!' /* ... */);
+            setSubmitAdd(false);
+            return;
+          }
+
+          params = { ...params, imgUrl: url };
+        }
+
+        const res = await CourseService.create_course(params);
         if (res?.statusCode === 200) {
           setSubmitAdd(false);
           setConfirmAddModal(false);
@@ -181,7 +196,7 @@ const CategoryAdd = () => {
             progress: undefined,
             pauseOnFocusLoss: false
           });
-          navigate(`/category`);
+          navigate(`/course`);
         } else {
           toast.error('Create Fail! Please try again.', {
             position: 'top-right',
@@ -232,14 +247,54 @@ const CategoryAdd = () => {
     }
   };
 
-  const handleParentCodeChange = (code: any) => {
-    setParentCode(code);
+  const handleInputChange = (e: any) => {
+    // setUploadImageErrorMessage("");
+    // setSizeImgErrorMgs("");
+    setImgError('');
+    setCurrentFile(e);
+
+    const currentSize = Math.floor(e.target.files[0].size / 1024);
+    const _checkSize = checkSize(currentSize);
+
+    const img = new Image();
+    img.src = window.URL.createObjectURL(e.target.files[0]);
+    img.onload = () => {
+      const _checkWidth = checkSizeImg(img.width, img.height);
+      if (!_checkWidth || !_checkSize) {
+      } else {
+        setImageUrl(URL.createObjectURL(e.target.files[0]));
+      }
+    };
   };
 
+  const checkSizeImg = (wImg: number, hImg: number) => {
+    if (wImg / hImg <= 7 / 4 && wImg / hImg >= 4 / 7) {
+      return true;
+    } else {
+      setImgError('Kích thước không đúng tỉ lệ!');
+      return false;
+    }
+  };
+
+  const checkSize = (size: any) => {
+    if (size > 2048) {
+      setImgError('Dung lượng ảnh không hợp lệ!');
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  useEffect(() => {
+    if (paramsURL.id) {
+      getDetailCourse(paramsURL.id);
+    }
+  }, [paramsURL.id]);
+
   return (
-    <div>
+    <>
       <Breadcrumb crumbs={crumbs} selected={selected} />
-      <TitlePage icon={() => <BookIcon />} name="Create Category" />
+      <TitlePage icon={() => <BookIcon />} name="Create Course" />
       <div className={`${paramsURL?.id ? 'mt-[85px]' : 'mt-10'}`}>
         <form
           className="form"
@@ -250,37 +305,37 @@ const CategoryAdd = () => {
           <ArticleCard className="mr-6 border-0 relative !rounded-none">
             {paramsURL.id && (
               <div className="flex absolute left-0 top-[-45px]">
-                <Link to={`/category-edit/${paramsURL.id}`}>
+                <Link to={`/course/course-edit/${paramsURL.id}`}>
                   <div
                     className={`p-[10px] rounded-t-md cursor-pointer ${
-                      tabActive === Tab.CATEGORY
+                      tabActive === Tab.COURSE
                         ? tabActiveStyle
                         : 'border-b !text-[#75757E]'
                     }`}
                     onClick={() => {
-                      setTabActive(Tab.CATEGORY);
+                      setTabActive(Tab.COURSE);
                     }}
                   >
-                    Category
+                    Course
                   </div>
                 </Link>
-                <Link to={`/group-question/${paramsURL.id}`}>
+                <Link to={`/course/course-chapter/${paramsURL.id}`}>
                   <div
                     className={`p-[10px] rounded-t-md cursor-pointer ${
-                      tabActive === Tab.GROUP_QUESTION
+                      tabActive === Tab.COURSE_CHAPTER
                         ? tabActiveStyle
                         : 'border-b !text-[#75757E]'
                     }`}
                     onClick={() => {
-                      setTabActive(Tab.GROUP_QUESTION);
+                      setTabActive(Tab.COURSE_CHAPTER);
                     }}
                   >
-                    Group Question
+                    Course Chapter
                   </div>
                 </Link>
               </div>
             )}
-            {tabActive === Tab.CATEGORY ? (
+            {tabActive === Tab.COURSE ? (
               <div>
                 {loading ? (
                   <div className="flex justify-center items-center">
@@ -288,35 +343,6 @@ const CategoryAdd = () => {
                   </div>
                 ) : (
                   <>
-                    <div className="flex justify-center">
-                      <div className="form-group my-2 ml-[5px] mr-[23px] w-1/2">
-                        <label
-                          htmlFor="code"
-                          className={`${OptionStyle.label_plus}`}
-                        >
-                          Code
-                        </label>
-                        <input
-                          id="code"
-                          type="text"
-                          required
-                          placeholder="Enter Code"
-                          className="form-control"
-                          {...register('code', {
-                            required: 'Code is required',
-                            setValueAs: (value: string) => value?.trim(),
-                            onChange: () => {
-                              trigger('code');
-                            }
-                          })}
-                        />
-                        {errors?.code?.message && (
-                          <span className="text-redCustom-3b text-xs">
-                            {errors?.code?.message as string}
-                          </span>
-                        )}
-                      </div>
-                    </div>
                     <div className="flex justify-center">
                       <div className="form-group my-2 ml-[5px] mr-[23px] w-1/2">
                         <label
@@ -346,38 +372,7 @@ const CategoryAdd = () => {
                         )}
                       </div>
                     </div>
-                    <div className="flex justify-center">
-                      <div
-                        className={`form-group my-2 ml-[5px] mr-[23px] w-1/2`}
-                      >
-                        <label
-                          className={`${OptionStyle.label_plus}`}
-                          htmlFor=""
-                        >
-                          Parent Code
-                        </label>
-                        <Select
-                          options={[
-                            {
-                              value: 'READING',
-                              label: 'READING'
-                            },
-                            {
-                              value: 'LISTENING',
-                              label: 'LISTENING'
-                            }
-                          ]}
-                          placeholder="Choose parent code"
-                          value={parentCode}
-                          onChange={handleParentCodeChange}
-                          className=" mt-1"
-                          classNamePrefix="select"
-                        />
-                        <span className="text-redCustom-3b text-xs">
-                          {errors?.is_system_admin?.message as string}
-                        </span>
-                      </div>
-                    </div>
+
                     <div className="flex justify-center">
                       <div className="form-group my-2 ml-[5px] mr-[23px] w-1/2">
                         <label
@@ -405,14 +400,81 @@ const CategoryAdd = () => {
                         )}
                       </div>
                     </div>
+                    <div className="flex justify-center ">
+                      <div
+                        className={`form-group my-2 ml-[5px] mr-[23px] w-1/2`}
+                      >
+                        <label
+                          className={`${OptionStyle.label_plus}`}
+                          htmlFor=""
+                        >
+                          Image
+                        </label>
+                        <div className="flex gap-5">
+                          {(!imageURL || imageError) && (
+                            <div className="flex gap-5">
+                              <div className="relative w-[180px] h-[180px] flex items-center justify-center bg-[#e4f4ff] border-dash cursor-pointer">
+                                <span className="text-[#0795fe] text-sm font-semibold line leading-6 cursor-pointer">
+                                  Tải hình ảnh lên
+                                </span>
+                                <input
+                                  type="file"
+                                  className={`opacity-0 absolute top-0 left-0 z-50 w-[180px] h-[180px]`}
+                                  onChange={handleInputChange}
+                                  accept="image/*"
+                                />
+                              </div>
+                            </div>
+                          )}
+                          {imageURL && !imageError && (
+                            <div className="flex gap-5">
+                              <div className="relative w-[180px] h-[180px] flex items-center justify-center cursor-pointer overflow-hidden">
+                                <img
+                                  src={imageURL}
+                                  alt=""
+                                  className={`mt-2 mb-4 w-[180px] h-[180px]`}
+                                  //   onError={() => setOnErrorImage(true)}
+                                />
+                                <input
+                                  type="file"
+                                  className={`opacity-0 absolute top-0 left-0 z-50 w-[180px] h-[180px]`}
+                                  onChange={handleInputChange}
+                                  accept="image/*"
+                                />
+                              </div>
+                            </div>
+                          )}
+                          <div>
+                            <span className=" text-red-3b text-[20px] inline-block mr-1">
+                              *
+                            </span>
+                            <span className="text-[20px] leading-[26px] font-bold">
+                              Chú thích:{' '}
+                            </span>
+                            <div className=" text-sm leading-5 font-normal">
+                              <span className="text-sm">{`Kích thước ảnh trong khoản 4:7 và 7:4`}</span>
+                            </div>
+                            <div className=" text-sm leading-5 font-normal">
+                              <span className="text-sm">{`Dung lượng tối đa `}</span>
+                              <span className="text-[#4293F6] font-bold text-sm">{`2MB.`}</span>
+                            </div>
+                            {imageError && (
+                              <div className="text-redCustom-3b text-xs mt-3">
+                                {imageError}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </>
                 )}
               </div>
             ) : (
-              <GroupQuestion />
+              <CourseChapter />
             )}
           </ArticleCard>
-          {tabActive === Tab.CATEGORY && (
+          {tabActive === Tab.COURSE && (
             <Button
               type="button"
               className="min-w-[140px]"
@@ -428,7 +490,7 @@ const CategoryAdd = () => {
 
           <Modal
             show={confirmAddModal}
-            title={'Do you want to add this category?'}
+            title={'Do you want to add this course?'}
             onClose={() => {
               setConfirmAddModal(false);
             }}
@@ -487,8 +549,8 @@ const CategoryAdd = () => {
           </Modal>
         </form>
       </div>
-    </div>
+    </>
   );
 };
 
-export default CategoryAdd;
+export default CourseManagementAdd;

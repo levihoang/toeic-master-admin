@@ -11,7 +11,7 @@ export const USER = {
 
 export const QUESTION = {
   GET_ALL: '/question',
-  GET_TYPE: '/question-type',
+  GET_TYPE: '/question-type'
 };
 
 export const GROUP_QUESTION = {
@@ -33,4 +33,21 @@ export const BLOG = {
   CREATE: '/admin/blog/create',
   DETAIL: (id: string) => `/admin/blog/${id}`,
   UPDATE: (id: string) => `/admin/blog/${id}`
+};
+
+export const COURSE = {
+  GET_ALL: '/course',
+  CREATE: '/course',
+  DETAIL: (id: string) => `/course/${id}`,
+  UPDATE: (id: string) => `/course/${id}`,
+  GET_ALL_COURSE_CHAPTER: '/course-chapter',
+  CREATE_COURSE_CHAPTER: '/course-chapter',
+  UPDATE_COURSE_CHAPTER: (id: string) => `/course-chapter/${id}`,
+  GET_DETAIL_COURSE_CHAPTER: (id: string) => `/course-chapter/${id}`
+};
+
+export const EXAM = {
+  GET_ALL: '/exam',
+  DETAIL: (id: string) => `/exam/${id}`,
+  CREATE: '/exam/create'
 };

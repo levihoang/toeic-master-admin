@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.0cbcf9d1.css",
+    "main.js": "/static/js/main.2ab9dc90.js",
+    "static/js/787.b482a343.chunk.js": "/static/js/787.b482a343.chunk.js",
+    "static/media/Learning-cuate-2.png": "/static/media/Learning-cuate-2.22563182730ae242e89f.png",
+    "index.html": "/index.html",
+    "main.0cbcf9d1.css.map": "/static/css/main.0cbcf9d1.css.map",
+    "main.2ab9dc90.js.map": "/static/js/main.2ab9dc90.js.map",
+    "787.b482a343.chunk.js.map": "/static/js/787.b482a343.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0cbcf9d1.css",
+    "static/js/main.2ab9dc90.js"
+  ]
+}

@@ -5,6 +5,8 @@ import { HomePage } from '../pages/Home/HomePage';
 import CategoryAdd from '../pages/Home/CategoryAdd';
 import CourseManagement from '../pages/CourseManagement/CourseManagement';
 import ExamManagement from '../pages/ExamManagement/ExamManagement';
+import ExamManagementAdd from '../pages/ExamManagement/ExamManagementAdd';
+import ExamGroupQuestion from '../pages/ExamManagement/ExamGroupQuestion';
 
 const RequireAuth: React.FC<{ children: JSX.Element }> = ({
   children
@@ -30,6 +32,36 @@ export const ExamRoutes = () => {
           element={
             <RequireAuth>
               <ExamManagement />
+            </RequireAuth>
+          }
+        />
+      </Route>
+      <Route path="/exam-add" element={<MasterLayout />}>
+        <Route
+          index
+          element={
+            <RequireAuth>
+              <ExamManagementAdd />
+            </RequireAuth>
+          }
+        />
+      </Route>
+      <Route path="/exam-edit/:id" element={<MasterLayout />}>
+        <Route
+          index
+          element={
+            <RequireAuth>
+              <ExamManagementAdd />
+            </RequireAuth>
+          }
+        />
+      </Route>
+      <Route path="/exam-group-question/:id" element={<MasterLayout />}>
+        <Route
+          index
+          element={
+            <RequireAuth>
+              <ExamManagementAdd />
             </RequireAuth>
           }
         />

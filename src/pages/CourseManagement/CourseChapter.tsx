@@ -109,7 +109,7 @@ const CourseChapter = () => {
   useEffect(() => {
     let params = {
       pageNumber: 1,
-      itemPerPage: itemPerPage,
+      limit: 1000,
       keyword: ''
     };
     if (keyword) {
@@ -223,7 +223,7 @@ const CourseChapter = () => {
     }
   };
 
-  const handleChangeGroupQuestion = (selectedOption: any) => {
+  const handleChangeGroupQuestion = (selectedOption: any, e: any) => {
     setGroupQuestionOptions(selectedOption);
   };
 

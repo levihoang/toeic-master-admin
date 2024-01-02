@@ -40,8 +40,6 @@ const ExamManagement = () => {
     getData();
   }, []);
 
-  console.log('examData', examData);
-
   return (
     <>
       <Breadcrumb crumbs={crumbs} selected={selected} />
@@ -49,7 +47,7 @@ const ExamManagement = () => {
         <TitlePage icon={() => <BookIcon />} name="Exam Management" />
         <div className="flex">
           <div className="mr-6">
-            <Button url="blog-add">Create Exam</Button>
+            <Button url="exam-add">Create Exam</Button>
           </div>
         </div>
       </div>
@@ -88,9 +86,11 @@ const ExamManagement = () => {
                         ) || '-'}
                       </td>
                       <td className={`order`}>
-                        <p>
-                          {item?.status || '-'}
-                        </p>
+                        <div className="p-1 bg-slate-200 w-fit rounded">
+                          <p className={`mb-0 status-${item?.status} font-semibold`}>
+                            {item?.status || '-'}
+                          </p>
+                        </div>
                       </td>
                       <td>
                         <div className="table-action-btn table-action-edit w-fit">

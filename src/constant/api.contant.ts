@@ -47,7 +47,15 @@ export const COURSE = {
 };
 
 export const EXAM = {
-  GET_ALL: '/exam',
-  DETAIL: (id: string) => `/exam/${id}`,
-  CREATE: '/exam/create'
+  GET_ALL: '/admin/exam',
+  DETAIL: (id: string) => `/admin/exam/${id}`,
+  CREATE: '/admin/exam/create',
+  UPDATE: (id: string) => `/admin/exam/${id}`
+};
+
+export const EXAM_GROUP_QUESTION = {
+  GET_ALL: '/admin/group-question-exam',
+  DETAIL: (id: string) => `/admin/group-question-exam/${id}`,
+  CREATE: '/admin/group-question-exam/create',
+  UPDATE: (id: string) => `/admin/group-question-exam/${id}`
 };
